@@ -1,0 +1,37 @@
+<?php
+
+/**
+ *
+ * @file
+ * Primary module hooks for template name by domain module.
+ *
+ * @DCG
+ * This file is no longer required in Drupal 8.
+ * @see https://www.drupal.org/node/2217931
+ */
+
+/**
+ * implement hook_theme_suggestions_alter
+ */
+function templatenamebydomain_theme_suggestions_alter(array &$suggestions, array $vars, $hook) {
+  if (str_contains($hook, 'formatage_models')) {
+    /**
+     *
+     * @var \Drupal\domain\DomainNegotiator $domainNego
+     */
+    $domainNego = \Drupal::service('domain.negotiator');
+    $domaineId = $domainNego->getActiveId();
+    if (!empty($vars['theme_hook_original'])) {
+      $suggestions[] = $vars['theme_hook_original'] . '__' . $domaineId;
+      if (!empty($vars['view'])) {
+        /**
+         *
+         * @var \Drupal\views\ViewExecutable $view
+         */
+        $view = $vars['view'];
+        $suggestions[] = $vars['theme_hook_original'] . '__' . $domaineId . '__' . $view->id();
+        $suggestions[] = $vars['theme_hook_original'] . '__' . $domaineId . '__' . $view->id() . '_' . $view->current_display;
+      }
+    }
+  }
+}
